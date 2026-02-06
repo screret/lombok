@@ -3,8 +3,8 @@ import javax.annotation.Nullable;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-public @lombok.extern.jackson.Jacksonized @lombok.Builder @JsonIgnoreProperties @com.fasterxml.jackson.databind.annotation.JsonDeserialize(builder = JacksonizedOnRecord.JacksonizedOnRecordBuilder.class) record JacksonizedOnRecord(String string, List values) {
-  public static @java.lang.SuppressWarnings("all") @lombok.Generated @JsonIgnoreProperties @com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder(withPrefix = "",buildMethodName = "build") class JacksonizedOnRecordBuilder {
+public @lombok.extern.jackson.Jacksonized @lombok.Builder @JsonIgnoreProperties @com.fasterxml.jackson.databind.annotation.JsonDeserialize(builder = JacksonizedOnRecord.JacksonizedOnRecordBuilder.class) @tools.jackson.databind.annotation.JsonDeserialize(builder = JacksonizedOnRecord.JacksonizedOnRecordBuilder.class) record JacksonizedOnRecord(String string, List values) {
+  public static @java.lang.SuppressWarnings("all") @lombok.Generated @JsonIgnoreProperties @com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder(withPrefix = "",buildMethodName = "build") @tools.jackson.databind.annotation.JsonPOJOBuilder(withPrefix = "",buildMethodName = "build") class JacksonizedOnRecordBuilder {
     private @java.lang.SuppressWarnings("all") @lombok.Generated String string;
     private @java.lang.SuppressWarnings("all") @lombok.Generated java.util.ArrayList<String> values;
     @java.lang.SuppressWarnings("all") @lombok.Generated JacksonizedOnRecordBuilder() {
