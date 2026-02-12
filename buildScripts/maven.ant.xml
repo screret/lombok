@@ -19,7 +19,7 @@
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   THE SOFTWARE.
 -->
-<project name="lombok.maven" xmlns:ivy="antlib:com.zwitserloot.ivyplusplus" basedir="..">
+<project name="lombok.maven" xmlns:ivy="antlib:com.zwitserloot.ivyplusplus" xmlns:artifact="antlib:org.apache.maven.artifact.ant" basedir="..">
 	<description>
 This buildfile is part of projectlombok.org. It makes maven-compatible repositories.
 	</description>
@@ -155,5 +155,23 @@ This buildfile is part of projectlombok.org. It makes maven-compatible repositor
 				<not><isset property="mvn.result" /></not>
 			</condition>
 		</fail>
+	</target>
+
+	<target name="maven.publish.custom" depends="version, dist, javadoc.build" description="Publish a snapshot release to a maven repo defined in env.MAVEN_URL">
+		<maven.make version-name="${lombok.version}-SNAPSHOT" />
+		<artifact:pom id="mypom" file="build/lombok-${lombok.version}-SNAPSHOT.pom" />
+
+		<fail unless="env.MAVEN_URL">
+			MAVEN_URL is not set. Set MAVEN_URL to continue.
+		</fail>
+
+		<artifact:deploy file="dist/lombok-${lombok.version}.jar">
+			<remoteRepository id="repository" url="${env.MAVEN_URL}">
+				<authentication username="${env.MAVEN_USER}" password="${env.MAVEN_PASSWORD}"/>
+			</remoteRepository>
+			<pom refid="mypom"/>
+			<attach file="${basedir}/dist/lombok-${lombok.version}-sources.jar" type="jar" classifier="sources"/>
+			<attach file="${basedir}/dist/lombok-${lombok.version}-javadoc.jar" type="jar" classifier="javadoc"/>
+		</artifact:deploy>
 	</target>
 </project>
