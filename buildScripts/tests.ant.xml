@@ -19,7 +19,7 @@
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   THE SOFTWARE.
 -->
-<project name="lombok.tests" default="test" xmlns:ivy="antlib:com.zwitserloot.ivyplusplus" basedir="..">
+<project name="lombok.tests" default="test" xmlns:ivy="antlib:com.zwitserloot.ivyplusplus" xmlns:artifact="antlib:org.apache.maven.artifact.ant" basedir="..">
 	<description>
 This buildfile is part of projectlombok.org. It takes care of compiling and running tests.
 	</description>

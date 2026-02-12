@@ -19,7 +19,7 @@
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   THE SOFTWARE.
 -->
-<project name="lombok.eclipsep2" basedir=".." xmlns:ivy="antlib:com.zwitserloot.ivyplusplus">
+<project name="lombok.eclipsep2" basedir=".." xmlns:ivy="antlib:com.zwitserloot.ivyplusplus" xmlns:artifact="antlib:org.apache.maven.artifact.ant">
 	<description>
 This buildfile is part of projectlombok.org. It is responsible for building the eclipse P2 update site.
 	</description>

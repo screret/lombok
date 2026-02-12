@@ -19,7 +19,7 @@
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   THE SOFTWARE.
 -->
-<project name="lombok.setup" default="deps" xmlns:ivy="antlib:com.zwitserloot.ivyplusplus" xmlns:unless="ant:unless" basedir="..">
+<project name="lombok.setup" default="deps" xmlns:ivy="antlib:com.zwitserloot.ivyplusplus" xmlns:artifact="antlib:org.apache.maven.artifact.ant" xmlns:unless="ant:unless" basedir="..">
 	<description>
 This buildfile is part of projectlombok.org. It sets up the build itself.
 	</description>
@@ -31,7 +31,8 @@ This buildfile is part of projectlombok.org. It sets up the build itself.
 	<property name="ivy.retrieve.pattern" value="lib/[conf]/[organisation]-[artifact].[ext]" />
 	<property environment="env" />
 	<available file="lib/ivyplusplus.jar" property="ivyplusplus.available" />
-	
+	<available file="lib/maven-ant-tasks.jar" property="anttasks.available" />
+
 	<property name="jdk6-rt.loc" location="lib/openjdk6_rt.jar" />
 	<property name="jdk8-rt.loc" location="lib/openjdk8_rt.jar" />
 	<property name="rtstubs18.loc" location="lib/rtstubs18.jar" />
@@ -129,6 +130,27 @@ This buildfile is part of projectlombok.org. It sets up the build itself.
 		<ivy:configure file="buildScripts/ivysettings.xml" />
 		<property name="ivy.config" value="true" />
 	</target>
+
+	<target name="-anttasks.download" unless="anttasks.available">
+		<mkdir dir="lib" />
+		<get src="https://archive.apache.org/dist/maven/ant-tasks/2.1.3/binaries/maven-ant-tasks-2.1.3.jar" dest="lib/maven-ant-tasks.jar" usetimestamp="true" />
+	</target>
+
+	<target name="-anttasks.load" depends="-anttasks.download">
+		<path id="maven-ant-tasks.classpath" path="lib/maven-ant-tasks.jar" />
+		<typedef resource="org/apache/maven/artifact/ant/antlib.xml"
+				 uri="antlib:org.apache.maven.artifact.ant"
+				 classpathref="maven-ant-tasks.classpath" />
+		<!-- <ivy:ensureippversion version="1.42" property="anttasks.minimumAvailable" /> -->
+		<property name="anttasks.minimumAvailable" value="true" />
+	</target>
+
+	<target name="-anttasks.redownload" unless="anttasks.minimumAvailable">
+		<get src="https://archive.apache.org/dist/maven/ant-tasks/2.1.3/binaries/maven-ant-tasks-2.1.3.jar" dest="lib/maven-ant-tasks.jar" />
+		<fail>A new version of Maven Ant Tasks was required and has been downloaded. Rerun the script to continue.</fail>
+	</target>
+
+	<target name="anttasks.setup" depends="-anttasks.load, -anttasks.redownload" />
 	
 	<target name="deps.jdk6-runtime" unless="jdk6-rt.available">
 		<echo>To ensure stable builds and avoid accessing API that was not available in JDK6, most of lombok is set up to build against OpenJDK6's runtime, which will now be downloaded...</echo>
@@ -236,7 +258,7 @@ This buildfile is part of projectlombok.org. It sets up the build itself.
 		</sequential>
 	</macrodef>
 	
-	<target name="deps" depends="ivy.config, deps.jdk-runtime" description="Downloads all dependencies needed for common tasks">
+	<target name="deps" depends="ivy.config, deps.jdk-runtime, anttasks.setup" description="Downloads all dependencies needed for common tasks">
 		<ivy:resolve file="buildScripts/ivy.xml" refresh="true" conf="javac6,javac8,ecj8,build,eclipse-oxygen,mapstruct,sources,stripe,buildtools,test" />
 		<ivy:retrieve symlink="true" />
 		<ivy:cachepath pathid="cp.javac6" conf="javac6" />

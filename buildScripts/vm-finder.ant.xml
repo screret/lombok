@@ -19,7 +19,7 @@
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   THE SOFTWARE.
 -->
-<project name="lombok.vm-finder" xmlns:ivy="antlib:com.zwitserloot.ivyplusplus" basedir="..">
+<project name="lombok.vm-finder" xmlns:ivy="antlib:com.zwitserloot.ivyplusplus" xmlns:artifact="antlib:org.apache.maven.artifact.ant" basedir="..">
 	<description>
 This buildfile is part of projectlombok.org. It contains platform specific code to find installed JVMs.
 	</description>

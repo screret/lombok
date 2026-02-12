@@ -19,7 +19,7 @@
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   THE SOFTWARE.
 -->
-<project name="lombok.build-support" default="dist" xmlns:ivy="antlib:com.zwitserloot.ivyplusplus" basedir="..">
+<project name="lombok.build-support" default="dist" xmlns:ivy="antlib:com.zwitserloot.ivyplusplus" xmlns:artifact="antlib:org.apache.maven.artifact.ant" basedir="..">
 	<description>
 This buildfile is part of projectlombok.org. It is responsible for tasks that help with setting up the build infrastructure.
 None of these tasks are normally needed, unless modifying how the build works, such as updating dependencies.
