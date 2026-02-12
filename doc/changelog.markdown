@@ -5,6 +5,7 @@ Lombok Changelog
 * FEATURE: `@Jacksonized` now supports both Jackson2 and Jackson3; you'll get a warning until you configure which one (or even both!) you want lombok to generate. [#3950](https://github.com/projectlombok/lombok/issues/3950).
 * BUGFIX: On JDK25, `val` and `@ExtensionMethod` could sometimes cause erroneous errors (in that you see errors but compilation succeeds anyway) using javac. [#3947](https://github.com/projectlombok/lombok/issues/3947).
 * BUGFIX: `@Jacksonized` + fields marked `transient` would result in those transient fields being serialised which is surprising (and thus undesired) behaviour. [#3936](https://github.com/projectlombok/lombok/issues/3936).
+* FEATURE: `@ExtensionMethod` now supports 'default' extensions using [config key](https://projectlombok.org/features/configuration) `lombok.extensionMethod.defaultExtensions`.
 
 ### v1.18.42 (September 18th, 2025)
 * FEATURE: All the various `@Log` annotations now allow you to change their access level (they still default to `private`). [#2280](https://github.com/projectlombok/lombok/issues/2280). Thanks to new contributor Liam Pace!
