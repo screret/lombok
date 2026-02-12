@@ -36,6 +36,7 @@ import lombok.core.AnnotationValues;
 import lombok.core.HandlerPriority;
 import lombok.core.configuration.TypeName;
 import lombok.experimental.ExtensionMethod;
+import lombok.javac.Javac;
 import lombok.javac.JavacASTAdapter;
 import lombok.javac.JavacASTVisitor;
 import lombok.javac.JavacNode;
@@ -54,6 +55,7 @@ import com.sun.tools.javac.code.Type.ErrorType;
 import com.sun.tools.javac.code.Type.ForAll;
 import com.sun.tools.javac.code.Type.MethodType;
 import com.sun.tools.javac.code.Types;
+import com.sun.tools.javac.main.JavaCompiler;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.JCTree.JCAnnotation;
 import com.sun.tools.javac.tree.JCTree.JCClassDecl;
@@ -61,6 +63,8 @@ import com.sun.tools.javac.tree.JCTree.JCExpression;
 import com.sun.tools.javac.tree.JCTree.JCFieldAccess;
 import com.sun.tools.javac.tree.JCTree.JCIdent;
 import com.sun.tools.javac.tree.JCTree.JCMethodInvocation;
+import com.sun.tools.javac.util.Convert;
+import com.sun.tools.javac.util.Name;
 
 /**
  * Handles the {@link ExtensionMethod} annotation for javac.
@@ -87,6 +91,8 @@ public class HandleExtensionMethod extends JavacASTAdapter {
 
 			source = jn;
 			extensionMethod = createAnnotation(ExtensionMethod.class, jn);
+			deleteAnnotationIfNeccessary(jn, ExtensionMethod.class);
+
 			suppressBaseMethodsIsExplicit = extensionMethod.isExplicit("suppressBaseMethods");
 
 			handleExperimentalFlagUsage(jn, ConfigurationKeys.EXTENSION_METHOD_FLAG_USAGE, "@ExtensionMethod");
@@ -103,14 +109,14 @@ public class HandleExtensionMethod extends JavacASTAdapter {
 		List<Extension> defaultExtensions = findDefaultExtensions(typeNode);
 
 		List<Object> extensionProviders = extensionMethod != null ? extensionMethod.getActualExpressions("value") : Collections.emptyList();
-		if (extensionProviders.isEmpty() && defaultExtensions.isEmpty()) {
+		if (extensionMethod != null && extensionProviders.isEmpty() && !defaultExtensions.isEmpty()) {
 			source.addWarning("@ExtensionMethod has no effect since no extension types were specified.");
 			return;
 		}
 
 		final List<Extension> extensions = getExtensions(source, extensionProviders);
+		if (extensions.isEmpty() && defaultExtensions.isEmpty()) return;
         extensions.addAll(defaultExtensions);
-        if (extensions.isEmpty()) return;
 
 		boolean emSuppressBaseMethods = (extensionMethod != null && suppressBaseMethodsIsExplicit) ? em.suppressBaseMethods() : defaultSuppressBaseMethods;
 
@@ -151,15 +157,23 @@ public class HandleExtensionMethod extends JavacASTAdapter {
 
 	public List<Extension> findDefaultExtensions(JavacNode typeNode) {
 		java.util.List<TypeName> configuredDefaults = typeNode.getAst().readConfiguration(ConfigurationKeys.EXTENSION_METHOD_DEFAULT_EXTENSIONS);
+		if (configuredDefaults.isEmpty()) return Collections.<Extension>emptyList();
 
 		List<Extension> extensions = new ArrayList<Extension>();
 		for (TypeName cn : configuredDefaults) {
-			JCExpression extensionType = chainDotsString(typeNode, cn.getName());
-			Type providerType = CLASS.resolveMember(typeNode, extensionType);
-			if (providerType == null) continue;
-			if ((providerType.tsym.flags() & (INTERFACE | ANNOTATION)) != 0) continue;
+			Name name = typeNode.toName(cn.getName());
 
-			extensions.add(getExtension(typeNode, (ClassType) providerType));
+			Object module = null;
+			if (Javac.getJavaCompilerVersion() >= 9) {
+				module = typeNode.getSymbolTable().inferModule(Convert.packagePart(name));
+				if (module == null) {
+					module = typeNode.getSymbolTable().unnamedModule;
+				}
+			}
+			ClassSymbol classSymbol = Javac.resolveIdent(JavaCompiler.instance(typeNode.getContext()), module, cn.getName());
+			if ((classSymbol.flags() & (INTERFACE | ANNOTATION)) != 0) continue;
+
+			extensions.add(getExtension(typeNode, (ClassType) classSymbol.type));
 		}
 		return extensions;
 	}
